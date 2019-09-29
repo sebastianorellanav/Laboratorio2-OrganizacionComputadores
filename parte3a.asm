@@ -6,8 +6,8 @@
 
 #Segmento de Datos
 .data
-	mensaje1:	   .asciiz "Ingrese un numero para calcular el seno: "
-	mensaje2: 	   .asciiz "El resultado es: "
+	mensaje1:	   .asciiz "Ingrese x para calcular el sen(x): "
+	mensaje2: 	   .asciiz "sen(x) = "
 	mensaje3: 	   .asciiz "No existe factorial para el numero ingresado"
 	mensaje4:        .asciiz "Ingrese el orden de la serie de taylor: "
 	mensaje5: 	   .asciiz "No se puede dividir por 0"
@@ -32,16 +32,8 @@ main:
 	#Preparar arguemento para el procedimiento CalcularSeno
 	move $a1, $v0
 	
-	#Mostrar mensaje 1 al usuario
-	li $v0, 4	     #indicar al sistema que se quiere mostrar un string por pantalla
-	la $a0, mensaje4    #cargar la dirección de memoria del mensaje 1
-	syscall     	     #llamada al sistema: mostrar el mensaje por pantalla
-	
-	#Pedir Entero al usuario
-	jal pedirEntero	#ir al procedimiento pedirEntero
-	
-	move $a2, $v0
-	subi $a2, $a2, 4
+	#Orden de la serie de taylor
+	li $a2, 3
 	
 	#Culacular el seno
 	jal calcularSeno
