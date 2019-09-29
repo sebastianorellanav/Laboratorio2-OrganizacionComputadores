@@ -2,11 +2,11 @@
 #######################################   LABORATORIO 2 ORGANIZACIÓN DE COMPUTADORES   ###############################################
 
 ############### PARTE 3: CALCULAR APROXIMACION DE FUNCIONES
-############### A) Calcular la aproximacion del SENO
+############### A) Calcular la aproximacion del COSENO
 
 #Segmento de Datos
 .data
-	mensaje1:	   .asciiz "Ingrese un numero para calcular el seno: "
+	mensaje1:	   .asciiz "Ingrese un numero para calcular el coseno: "
 	mensaje2: 	   .asciiz "El resultado es: "
 	mensaje3: 	   .asciiz "No existe factorial para el numero ingresado"
 	mensaje4:        .asciiz "Ingrese el orden de la serie de taylor: "
@@ -29,7 +29,7 @@ main:
 	#Pedir Entero al usuario
 	jal pedirEntero	#ir al procedimiento pedirEntero
 	
-	#Preparar arguemento para el procedimiento CalcularSeno
+	#Preparar arguemento para el procedimiento CalcularCoseno
 	move $a1, $v0
 	
 	#Mostrar mensaje 1 al usuario
@@ -44,7 +44,7 @@ main:
 	subi $a2, $a2, 4
 	
 	#Culacular el seno
-	jal calcularSeno
+	jal calcularCoseno
 	
 	#Mostrar mensaje 2 al usuario: "El resultado es: "
 	li $v0, 4	    #indicar al sistema que se quiere mostrar un string por pantalla
@@ -64,7 +64,7 @@ main:
 #Argumentos:  $a1 = numero
 #Argumentos:  $a2 = orden
 #Resultado:   
-calcularSeno:
+calcularCoseno:
 	addi $sp, $sp, -36	
 	sw $ra, 32($sp)
 	sw $t0, 28($sp)
@@ -78,20 +78,20 @@ calcularSeno:
 	move $t0, $a1		#guardar numero
 	move $t1, $a2		#guardar orden 
 	l.d $f0, ceroDouble
-	cicloSeno:
+	cicloCoseno:
 		#calcular (-1)^n
 		li $a1, -1
 		move $a2, $t1
 		jal calcularPotencia
 		move $s0, $v1
 		
-		#calcular 2n+1
+		#calcular 2n
 		li $a1, 2
 		move $a2, $t1
 		jal calcularMultiplicacion
-		addi $s1, $v1, 1
+		move $s1, $v1
 		
-		#calcular x^(2n+1)
+		#calcular x^(2n)
 		move $a1, $t0
 		move $a2, $s1
 		jal calcularPotencia
@@ -105,7 +105,7 @@ calcularSeno:
 			jal cambiarSigno
 			move $s2, $v0
 		continuar:
-		#calcular (2n-1)!
+		#calcular (2n)!
 		move $a0, $s1
 		jal calcularFactorial
 		move $s3, $v1
@@ -120,7 +120,7 @@ calcularSeno:
 		subi $t1, $t1, 1
 		
 		#mientras n >= 1 volver a repetir
-		bgez $t1, cicloSeno
+		bgez $t1, cicloCoseno
 		mov.d $f4, $f0
 	#Resturar Registros
 	l.d $f0, 0($sp)
