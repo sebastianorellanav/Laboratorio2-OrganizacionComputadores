@@ -63,7 +63,11 @@ main:
 	
 	#terminar Programa
 	j terminarPrograma
-	
+
+#Procedimiento que calcula la division de dos numeros enteros
+#Argmentos:   $a1 = numero 1
+#		$a2 = numero 2
+#Resultado:   $f4	
 calcularDivision:	
 	beqz $a1, divisionCero	#si el primer numero es 0 la division es 0
 	beqz $a2, divisionInvalida	#si el segundo numero es 0 la division es invalida
