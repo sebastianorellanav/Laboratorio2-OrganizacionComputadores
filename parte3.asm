@@ -2,20 +2,24 @@
 #######################################   LABORATORIO 2 ORGANIZACIÓN DE COMPUTADORES   ###############################################
 
 ############### PARTE 3: CALCULAR APROXIMACION DE FUNCIONES
-############### A) Calcular la aproximacion del SENO
+############### 1) SENO
+############### 2) COSENO
+############### 3) EXPONENCIAL
 
 #Segmento de Datos
 .data
-	mensaje1:	   .asciiz "Ingrese x para calcular el sen(x): "
-	mensaje2: 	   .asciiz "sen(x) = "
-	mensaje3: 	   .asciiz "No existe factorial para el numero ingresado"
-	mensaje4:        .asciiz "Ingrese el orden de la serie de taylor: "
-	mensaje5: 	   .asciiz "No se puede dividir por 0"
-	parteEntera:	   .double 1.00
-	parteDecimal:    .double 0.10
-	parteCentecimal: .double 0.01
-	ceroDouble:      .double 0.00
-	saltoLinea:      .asciiz "\n"
+	mensaje1:	      .asciiz "Ingrese un numero entero no negativo: "
+	mensaje2: 	      .asciiz "Ingrese el orden de la serie de Taylor: "
+	mensaje2Seno:       .asciiz "sen(x) = "
+	mensaje1Coseno:     .asciiz "\ncos(x) = "
+	mensajeExponencial: .asciiz "\nexponencial = "
+	mensaje3: 	      .asciiz "No existe factorial para el numero ingresado"
+	mensaje4:           .asciiz "Ingrese el orden de la serie de taylor: "
+	mensaje5: 	      .asciiz "No se puede dividir por 0"
+	parteEntera:	      .double 1.00
+	parteDecimal:       .double 0.10
+	parteCentecimal:    .double 0.01
+	ceroDouble:         .double 0.00
 
 #Segmento de Texto
 .text
@@ -23,24 +27,36 @@
 main: 
 	#Mostrar mensaje 1 al usuario
 	li $v0, 4	     #indicar al sistema que se quiere mostrar un string por pantalla
-	la $a0, mensaje1    #cargar la dirección de memoria del mensaje 1
+	la $a0, mensaje1   #cargar la dirección de memoria del mensaje 1
 	syscall     	     #llamada al sistema: mostrar el mensaje por pantalla
 	
 	#Pedir Entero al usuario
 	jal pedirEntero	#ir al procedimiento pedirEntero
 	
 	#Preparar arguemento para el procedimiento CalcularSeno
+	move $s0, $v0
 	move $a1, $v0
 	
 	#Orden de la serie de taylor
-	li $a2, 3
+	#Orden de la serie de taylor
+	#Mostrar mensaje 1 al usuario
+	li $v0, 4	     #indicar al sistema que se quiere mostrar un string por pantalla
+	la $a0, mensaje1   #cargar la dirección de memoria del mensaje 1
+	syscall     	     #llamada al sistema: mostrar el mensaje por pantalla
+	
+	#Pedir Entero al usuario
+	jal pedirEntero	#ir al procedimiento pedirEntero
+	
+	#preparar argumentos para el seno
+	move $s1, $v0
+	subi $a2, $v0, 4
 	
 	#Culacular el seno
 	jal calcularSeno
 	
 	#Mostrar mensaje 2 al usuario: "El resultado es: "
 	li $v0, 4	    #indicar al sistema que se quiere mostrar un string por pantalla
-	la $a0, mensaje2    #cargar la dirección de memoria del mensaje 2
+	la $a0, mensaje2Seno    #cargar la dirección de memoria del mensaje 2
 	syscall		    #llamada al sistema: mostrar el mensaje por pantalla
 	
 	#imprimir por pantalla el resultado de la division	    
@@ -48,6 +64,40 @@ main:
 	mov.d $f12, $f4       #mover el entero de $f4 a $f12
 	syscall              #llamada al sistema: mostrar el entero por pantalla
 	
+	#Preparar argumentos para el coseno
+	move $a1, $s0
+	subi $a2, $s1, 4
+	
+	#Calcular el coseno
+	jal calcularCoseno
+	
+	#Mostrar mensaje 2 al usuario: "El resultado es: "
+	li $v0, 4	    #indicar al sistema que se quiere mostrar un string por pantalla
+	la $a0, mensaje1Coseno    #cargar la dirección de memoria del mensaje 2
+	syscall		    #llamada al sistema: mostrar el mensaje por pantalla
+	
+	#imprimir por pantalla el resultado de la division	    
+	li $v0, 3	       #indicarle al sistema que se quiere mostrar un entero
+	mov.d $f12, $f4       #mover el entero de $f4 a $f12
+	syscall              #llamada al sistema: mostrar el entero por pantalla
+	
+	#Prepara argumentos para la exponencial
+	move $a1, $s0
+	move $a2, $s1
+	
+	#Calcular la exponencial
+	jal calcularExponencial
+	
+	#Mostrar mensaje 2 al usuario: "El resultado es: "
+	li $v0, 4	    #indicar al sistema que se quiere mostrar un string por pantalla
+	la $a0, mensajeExponencial    #cargar la dirección de memoria del mensaje 2
+	syscall		    #llamada al sistema: mostrar el mensaje por pantalla
+	
+	#imprimir por pantalla el resultado de la division	    
+	li $v0, 3	       #indicarle al sistema que se quiere mostrar un entero
+	mov.d $f12, $f4       #mover el entero de $f4 a $f12
+	syscall              #llamada al sistema: mostrar el entero por pantalla
+				
 	#terminar Programa
 	j terminarPrograma
 
@@ -55,7 +105,7 @@ main:
 #Procedimiento para calcular en Sen($a1)
 #Argumentos:  $a1 = numero
 #Argumentos:  $a2 = orden
-#Resultado:   
+#Resultado:   $f4
 calcularSeno:
 	addi $sp, $sp, -36	
 	sw $ra, 32($sp)
@@ -66,7 +116,10 @@ calcularSeno:
 	sw $s2, 12($sp)
 	sw $s3, 8($sp)
 	s.d $f0, 0($sp)
-	
+
+	#Poner en 0 los valores de los registros
+	jal reiniciarValores
+
 	move $t0, $a1		#guardar numero
 	move $t1, $a2		#guardar orden 
 	l.d $f0, ceroDouble
@@ -126,7 +179,139 @@ calcularSeno:
 	addi $sp, $sp, 36
 	
 	jr $ra
-			
+
+#Procedimiento para calcular en Sen($a1)
+#Argumentos:  $a1 = numero
+#Argumentos:  $a2 = orden
+#Resultado:   $f4
+calcularCoseno:
+	addi $sp, $sp, -36	
+	sw $ra, 32($sp)
+	sw $t0, 28($sp)
+	sw $t1, 24($sp)
+	sw $s0, 20($sp)
+	sw $s1, 16($sp)
+	sw $s2, 12($sp)
+	sw $s3, 8($sp)
+	s.d $f0, 0($sp)
+	
+	#Poner en 0 los valores de los registros
+	jal reiniciarValores
+	
+	move $t0, $a1		#guardar numero
+	move $t1, $a2		#guardar orden 
+	l.d $f0, ceroDouble
+	cicloCoseno:
+		#calcular (-1)^n
+		li $a1, -1
+		move $a2, $t1
+		jal calcularPotencia
+		move $s0, $v1
+		
+		#calcular 2n
+		li $a1, 2
+		move $a2, $t1
+		jal calcularMultiplicacion
+		move $s1, $v1
+		
+		#calcular x^(2n)
+		move $a1, $t0
+		move $a2, $s1
+		jal calcularPotencia
+		move $s2, $v1
+		
+		#if (-1)^n = -1
+		move $a0, $s2
+		beq $s0, -1, multiXMenos1
+		b continuar2
+		multiXMenos1:
+			jal cambiarSigno
+			move $s2, $v0
+		continuar2:
+		#calcular (2n)!
+		move $a0, $s1
+		jal calcularFactorial
+		move $s3, $v1
+		
+		#calcular (-1)*x^(2n-1)/(2n-1)!
+		move $a1, $s2
+		move $a2, $s3
+		jal calcularDivision
+		add.d $f0, $f0, $f4
+		
+		#restar 2 a n
+		subi $t1, $t1, 1
+		
+		#mientras n >= 1 volver a repetir
+		bgez $t1, cicloCoseno
+		mov.d $f4, $f0
+	#Resturar Registros
+	l.d $f0, 0($sp)
+	lw $s3, 8($sp)
+	lw $s2, 12($sp)
+	lw $s1, 16($sp)
+	lw $s0, 20($sp)
+	lw $t1, 24($sp)
+	lw $t0, 28($sp)
+	lw $ra, 32($sp)
+	addi $sp, $sp, 36
+	
+	jr $ra
+
+#Procedimiento que calcula la funcion exponencial
+#Argumentos:  $a1 = numero
+#		$a2 = orden
+#Resultado:   $f4
+calcularExponencial:
+	addi $sp, $sp, -28	
+	sw $ra, 24($sp)
+	sw $t0, 20($sp)
+	sw $t1, 16($sp)
+	sw $s0, 12($sp)
+	sw $s1, 8($sp)
+	s.d $f0, 0($sp)
+	
+	#Poner en 0 los valores de los registros
+	jal reiniciarValores
+	
+	move $t0, $a1		#guardar numero
+	move $t1, $a2		#guardar orden 
+	l.d $f0, ceroDouble
+	cicloExponencial:
+		#calcular x^(n)
+		move $a1, $t0
+		move $a2, $t1
+		jal calcularPotencia
+		move $s0, $v1
+
+		#calcular (n)!
+		move $a0, $t1
+		jal calcularFactorial
+		move $s1, $v1
+		
+		#calcular x^(n)/n!
+		move $a1, $s0
+		move $a2, $s1
+		jal calcularDivision
+		add.d $f0, $f0, $f4
+		
+		#restar 2 a n
+		subi $t1, $t1, 1
+		
+		#mientras n >= 0 volver a repetir
+		bgez $t1, cicloExponencial
+		mov.d $f4, $f0
+	#Resturar Registros
+	l.d $f0, 0($sp)
+	lw $s1, 8($sp)
+	lw $s0, 12($sp)
+	lw $t1, 16($sp)
+	lw $t0, 20($sp)
+	lw $ra, 24($sp)
+	addi $sp, $sp, 28
+	
+	jr $ra
+						
 #Procedimiento que calcula la potencia n de un numero
 #Argumentos:  $a1 = numero
 #		$a2 = exponente
@@ -236,6 +421,17 @@ calcularMultiplicacion:
 		sw $t4, 4($sp)
 		sw $t5, 0($sp)
 		
+		bgt $a1, $a2, N1MayorQueN2
+		b N2MayorQueN1
+		N1MayorQueN2:	
+			move $t0, $a1	  # $t0 = numero 1
+			move $t1, $a2	  # $t1 = numero 2
+			b CalcularSigno
+		N2MayorQueN1:
+			move $t0, $a2   # $t0 = numero 2
+			move $t1, $a1   # $t1 = numero 1
+			b CalcularSigno
+			
 		# preparar los registros que se van a utilizar
 		move $t0, $a1	  # $t0 = numero 1
 		move $t1, $a2	  # $t1 = numero 2
@@ -243,11 +439,11 @@ calcularMultiplicacion:
 		li $t3, 0	  # $t3 = signo numero 2
 		li $t4, 0	  # $t4 = signo resultado
 		li $t5, 0	  # $t4 = resultado
-		
-		#verificar signos de los nuemros
-		bltz $t0, N1negativo		# if numero 1 < 0 ir a N1Negativo
-		bltz $t1, resultNegativ1	# elseif numero 2 < 0 ir a resultNegativ
-		b multiplicar			# else ir a multiplicar
+		CalcularSigno:
+			#verificar signos de los nuemros
+			bltz $t0, N1negativo		# if numero 1 < 0 ir a N1Negativo
+			bltz $t1, resultNegativ1	# elseif numero 2 < 0 ir a resultNegativ
+			b multiplicar			# else ir a multiplicar
 		
 		N1negativo: 	
 			   	li $t2, 1			# cambiar signo 1
@@ -466,8 +662,17 @@ calcularDivision:
 			l.d $f2, ceroDouble
 			sub.d $f4, $f2, $f4	# $f2 = 0 - $f2
 		jr $ra					# salir del procedimiento
-	
-		  	 	
+
+#Procedimiento que reinicia los valores de los registros
+reiniciarValores:
+	#ReiniciarValores
+	li $t0, 0
+	li $t1, 0
+	li $s0, 0
+	li $s1, 0
+	li $s2, 0
+	li $s3, 0
+	jr $ra		  	 	
 		  	 				  	 	
 #Procedimiento para cambiar de signo
 #Argumentos:  $a0 = numero

@@ -70,18 +70,29 @@ calcularMultiplicacion:
 		sw $t4, 4($sp)
 		sw $t5, 0($sp)
 		
+		#Optimizacion 
+		bgt $a1, $a2, N1MayorQueN2
+		b N2MayorQueN1
+		N1MayorQueN2:	
+			move $t0, $a1	  # $t0 = numero 1
+			move $t1, $a2	  # $t1 = numero 2
+			b CalcularSigno
+		N2MayorQueN1:
+			move $t0, $a2   # $t0 = numero 2
+			move $t1, $a1   # $t1 = numero 1
+			b CalcularSigno
+			
 		# preparar los registros que se van a utilizar
-		move $t0, $a1	  # $t0 = numero 1
-		move $t1, $a2	  # $t1 = numero 2
 		li $t2, 0	  # $t2 = signo numero 1
 		li $t3, 0	  # $t3 = signo numero 2
 		li $t4, 0	  # $t4 = signo resultado
 		li $t5, 0	  # $t4 = resultado
 		
-		#verificar signos de los nuemros
-		bltz $t0, N1negativo		# if numero 1 < 0 ir a N1Negativo
-		bltz $t1, resultNegativ1	# elseif numero 2 < 0 ir a resultNegativ
-		b multiplicar			# else ir a multiplicar
+		CalcularSigno:
+			#verificar signos de los nuemros
+			bltz $t0, N1negativo		# if numero 1 < 0 ir a N1Negativo
+			bltz $t1, resultNegativ1	# elseif numero 2 < 0 ir a resultNegativ
+			b multiplicar			# else ir a multiplicar
 		
 		N1negativo: 	
 			   	li $t2, 1			# cambiar signo 1
