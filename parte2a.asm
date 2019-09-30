@@ -11,7 +11,8 @@
 	
 #Segmento de Texto
 .text
-#Main Process
+###################################################################################################################
+#						Main Process
 main:	
 	#Mostrar mensaje 1 al usuario: "Por favor ingrese el primer entero: "
 	li $v0, 4	    	#indicar al sistema que se quiere mostrar un string por pantalla
@@ -22,20 +23,20 @@ main:
 	jal pedirEntero	#ir al procedimiento pedirEntero
 	
 	#Guardar el dato ingresado en el registro $a1
-	move $a1, $v0 	    #mover el valor de $v0 a $a1
-			    	    # $a1 = argumento 1 de la subrutina encontrarMenor
+	move $a1, $v0 	#mover el valor de $v0 a $a1
+			    	# $a1 = argumento 1 de la subrutina encontrarMenor
 	
 	#Mostrar mensaje 2 al usuario: "Por favor ingrese el segundo entero: "
-	li $v0, 4	    #indicar al sistema que se quiere mostrar un string por pantalla
-	la $a0, mensaje2    #cargar la dirección de memoria del mensaje 2
-	syscall		    #llamada al sistema: mostrar el mensaje por pantalla
+	li $v0, 4	    	#indicar al sistema que se quiere mostrar un string por pantalla
+	la $a0, mensaje2    	#cargar la dirección de memoria del mensaje 2
+	syscall		#llamada al sistema: mostrar el mensaje por pantalla
 	
 	#Pedir Entero al usuario
 	jal pedirEntero	#ir al procedimiento pedirEnter
 	
 	#Guardar el dato ingresado en el registro $a2
-	move $a2, $v0 	    #mover el valor de $v0 a $a2
-			    	    # $a2 = argumento 2 de la subrutina encontrarMenor
+	move $a2, $v0 	#mover el valor de $v0 a $a2
+			    	# $a2 = argumento 2 de la subrutina 
 	
 	#ir a calcularMultiplicacion
 	jal calcularMultiplicacion
